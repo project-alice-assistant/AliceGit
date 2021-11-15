@@ -26,7 +26,7 @@ with io.open('README.md', 'rt', encoding="utf8") as f:
 	readme = f.read()
 
 setup(
-	name='alice-git',
+	name='AliceGit',
 	author='ProjectAlice',
 	maintainer='Psychokiller1888',
 	maintainer_email='laurentchervet@bluewin.ch',
