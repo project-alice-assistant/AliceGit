@@ -249,6 +249,7 @@ class Repository:
 
 
 	def remoteAdd(self, url: str, name: str = 'origin'):
+		self.url = url
 		self.execute(f'git remote add {name} {url}')
 
 
