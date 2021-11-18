@@ -18,18 +18,17 @@
 #  Last modified: 2021.11.15 at 14:35:51 CET
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Dict, Optional, Tuple
-
 import json
 import requests
+from pathlib import Path
+from typing import Dict, Optional, Tuple
 
 from .Exceptions import GithubAlreadyForked, GithubCreateFailed, GithubForkFailed, GithubRateLimit, GithubRepoNotFound, GithubUserNotFound
 
 
 class Github:
 
-	def __init__(self, username: str = '', token: str = '', repositoryName: str = '', useUrlInstead: str = '', createRepository: bool = False):
+	def __init__(self, username: str = '', token: str = '', repositoryName: str = '', useUrlInstead: str = '', createRepository: bool = False, options: Dict = None):
 		if not useUrlInstead and (not username or not token or not repositoryName):
 			raise Exception('Please provide username, token and repository name if you are not using useUrlInstead')
 		elif useUrlInstead and createRepository:
@@ -54,7 +53,7 @@ class Github:
 			if response.status_code != 200 and not createRepository:
 				raise GithubRepoNotFound(repositoryName=repositoryName)
 			elif response.status_code != 200 and createRepository:
-				self.remote = self.createRepository(repositoryName=repositoryName)
+				self.remote = self.createRepository(repositoryName=repositoryName, options=options)
 			else:
 				self.remote = Remote(url=self.url, apiAuth=self.auth)
 		else:
@@ -90,6 +89,12 @@ class Github:
 			raise GithubCreateFailed(repositoryName=repositoryName, statusCode=response.status_code)
 		else:
 			return Remote(url=self.url, apiAuth=self.auth)
+
+
+	def repositoryExists(self) -> bool:
+		self.url = f'https://github.com/{self.username}/{self.repositoryName}.git'
+		response = requests.get(self.url)
+		return response.status_code == 200
 
 
 class Remote:
