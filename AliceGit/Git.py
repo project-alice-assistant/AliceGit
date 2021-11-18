@@ -32,7 +32,7 @@ from .Exceptions import AlreadyGitRepository, DirtyRepository, InvalidUrl, NotGi
 
 class Repository:
 
-	def __init__(self, directory: Union[str, Path], makeDir: bool = False, init: bool = False, url: str = '', quiet: bool = True):
+	def __init__(self, directory: Union[str, Path], makeDir: bool = False, init: bool = False, url: str = '', raiseIfExisting: bool = False, quiet: bool = True):
 		if isinstance(directory, str):
 			directory = Path(directory)
 
@@ -53,7 +53,8 @@ class Repository:
 			if not isRepository:
 				self.execute(f'git init')
 			else:
-				raise AlreadyGitRepository
+				if raiseIfExisting:
+					raise AlreadyGitRepository
 		else:
 			if not isRepository:
 				raise NotGitRepository
