@@ -18,14 +18,14 @@
 #  Last modified: 2021.11.15 at 14:35:51 CET
 from __future__ import annotations
 
-import os
-import shutil
 import stat
+
+import os
+import requests
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
-
-import requests
 
 from .Exceptions import AlreadyGitRepository, DirtyRepository, InvalidUrl, NotGitRepository, PathNotFoundException
 
@@ -44,6 +44,10 @@ class Repository:
 
 		directory.mkdir(parents=True, exist_ok=True)
 
+		self.path      = directory
+		self._quiet    = quiet
+		self.url       = url
+
 		isRepository = self.isRepository(directory=directory)
 		if init:
 			if not isRepository:
@@ -53,10 +57,6 @@ class Repository:
 		else:
 			if not isRepository:
 				raise NotGitRepository
-
-		self.path      = directory
-		self._quiet    = quiet
-		self.url       = url
 
 		tags           = self.execute('git tag')[0]
 		self.tags      = set(tags.split('\n'))
