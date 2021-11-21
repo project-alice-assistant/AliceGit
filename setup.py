@@ -41,10 +41,10 @@ setup(
 	setup_requires=['setuptools_scm'],
 	install_requires=[
 		'requests',
-		'pytest~=5.2.2',
-		'coverage~=4.5.4',
-		'pytest-cov~=2.8.1',
-		'coveralls~=1.8.2'
+		'pytest~=6.2.5',
+		'coverage~=5.5',
+		'pytest-cov~=3.0.0',
+		'coveralls~=3.3.1'
 	],
 	classifiers=[
 		"Development Status :: 3 - Alpha",
