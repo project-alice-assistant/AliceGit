@@ -87,7 +87,7 @@ class Repository:
 		cmd = f'git clone {url} {str(directory)} --branch {branch} --recurse-submodules'
 		if quiet:
 			cmd = f'{cmd} --quiet'
-		subprocess.run(cmd.split(), shell=True)
+		subprocess.run(cmd, shell=True, capture_output=True, text=True)
 		return Repository(directory=directory, url=url, quiet=quiet)
 
 
@@ -220,7 +220,7 @@ class Repository:
 		if self._quiet:
 			command = f'{command} --quiet'
 
-		result = subprocess.run(command.split(), capture_output=True, text=True, shell=True)
+		result = subprocess.run(command, capture_output=True, text=True, shell=True)
 		return result.stdout.strip(), result.stderr.strip()
 
 
@@ -277,7 +277,7 @@ class Status:
 		if isinstance(directory, str):
 			directory = Path(directory)
 
-		self._status = subprocess.run(f'git -C {str(directory)} status'.split(), capture_output=True, text=True, shell=True).stdout.strip()
+		self._status = subprocess.run(f'git -C {str(directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
 
 
 	def isDirty(self):
