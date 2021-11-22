@@ -178,6 +178,16 @@ class Repository:
 		self.execute('git pull')
 
 
+	def fetch(self, force: bool = False):
+		if self.isDirty():
+			if not force:
+				raise DirtyRepository()
+			else:
+				self.revert()
+
+		self.execute('git fetch')
+
+
 	def reset(self):
 		self.execute('git reset --hard')
 
