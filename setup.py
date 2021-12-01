@@ -42,7 +42,7 @@ setup(
 	install_requires=[
 		'requests',
 		'pytest~=6.2.5',
-		'coverage~=5.5',
+		'coverage~=6.2',
 		'pytest-cov~=3.0.0',
 		'coveralls~=3.3.1'
 	],
