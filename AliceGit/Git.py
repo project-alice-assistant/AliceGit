@@ -30,7 +30,7 @@ from typing import Callable, List, Tuple, Union
 from .Exceptions import AlreadyGitRepository, DirtyRepository, InvalidUrl, NotGitRepository, PathNotFoundException
 
 
-class Repository:
+class Repository(object):
 
 	def __init__(self, directory: Union[str, Path], makeDir: bool = False, init: bool = False, url: str = '', raiseIfExisting: bool = False, quiet: bool = True):
 		if isinstance(directory, str):
@@ -141,6 +141,11 @@ class Repository:
 	def isDirty(self) -> bool:
 		status = self.status()
 		return status.isDirty()
+
+
+	def isUpToDate(self) -> bool:
+		status = self.status()
+		return status.isUpToDate()
 
 
 	def revert(self):
@@ -281,14 +286,21 @@ class Repository:
 		self._quiet = value
 
 
-class Status:
+class Status(object):
 
 	def __init__(self, directory: Union[str, Path]):
 		if isinstance(directory, str):
 			directory = Path(directory)
 
-		self._status = subprocess.run(f'git -C {str(directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
+		self._directory = directory
 
 
 	def isDirty(self):
-		return 'working tree clean' not in self._status
+		status = subprocess.run(f'git -C {str(self._directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
+		return 'working tree clean' not in status
+
+
+	def isUpToDate(self):
+		subprocess.run(f'git -C {str(self._directory)} fetch origin')
+		status = subprocess.run(f'git -C {str(self._directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
+		return 'Your branch is up to date with' in status

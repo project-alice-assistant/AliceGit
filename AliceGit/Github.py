@@ -26,7 +26,7 @@ from typing import Dict, Optional, Tuple
 from .Exceptions import GithubAlreadyForked, GithubCreateFailed, GithubForkFailed, GithubRateLimit, GithubRepoNotFound, GithubUserNotFound
 
 
-class Github:
+class Github(object):
 
 	def __init__(self, username: str = '', token: str = '', repositoryName: str = '', useUrlInstead: str = '', createRepository: bool = False, options: Dict = None):
 		if not useUrlInstead and (not username or not token or not repositoryName):
@@ -97,7 +97,7 @@ class Github:
 		return response.status_code == 200
 
 
-class Remote:
+class Remote(object):
 	def __init__(self, url: str, apiAuth: Tuple[str, str]):
 		self.auth = apiAuth
 		self.url = url
