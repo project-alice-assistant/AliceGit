@@ -18,14 +18,14 @@
 #  Last modified: 2021.11.15 at 14:35:51 CET
 from __future__ import annotations
 
-import stat
-
 import os
-import requests
 import shutil
+import stat
 import subprocess
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
+
+import requests
 
 from .Exceptions import AlreadyGitRepository, DirtyRepository, InvalidUrl, NotGitRepository, PathNotFoundException
 
@@ -301,6 +301,6 @@ class Status(object):
 
 
 	def isUpToDate(self):
-		subprocess.run(f'git -C {str(self._directory)} fetch origin')
+		subprocess.run(f'git -C {str(self._directory)} fetch origin', shell=True)
 		status = subprocess.run(f'git -C {str(self._directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
 		return 'Your branch is up to date with' in status
