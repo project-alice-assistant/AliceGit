@@ -183,13 +183,7 @@ class Repository(object):
 		self.execute('git pull')
 
 
-	def fetch(self, force: bool = False):
-		if self.isDirty():
-			if not force:
-				raise DirtyRepository()
-			else:
-				self.revert()
-
+	def fetch(self):
 		self.execute('git fetch')
 
 
