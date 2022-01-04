@@ -63,6 +63,8 @@ class Repository(object):
 		self.tags      = set(tags.split('\n'))
 		branches       = self.execute('git branch')[0]
 		self.branches  = set(branches.split('\n'))
+		remotes        = self.execute('git remote')[0]
+		self.remotes   = set(remotes.split('\n'))
 
 
 	@classmethod
@@ -261,6 +263,9 @@ class Repository(object):
 	def remoteAdd(self, url: str, name: str = 'origin'):
 		self.url = url
 		self.execute(f'git remote add {name} {url}')
+		#update remotes
+		remotes = self.execute('git remote')[0]
+		self.remotes = set(remotes.split('\n'))
 
 
 	def file(self, filePath: Union[str, Path]) -> Path:
