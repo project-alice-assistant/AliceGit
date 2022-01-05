@@ -22,6 +22,7 @@ import os
 import shutil
 import stat
 import subprocess
+import re
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
 
@@ -63,8 +64,11 @@ class Repository(object):
 		self.tags      = set(tags.split('\n'))
 		branches       = self.execute('git branch')[0]
 		self.branches  = set(branches.split('\n'))
-		remotes        = self.execute('git remote')[0]
-		self.remotes   = set(remotes.split('\n'))
+
+	@property
+	def remote(self) -> dict[Remote]:
+		remotes = self.execute('git remote')[0]
+		return dict((rem.user, rem) for rem in [Remote(statusString=st) for st in remotes.split('\n')])
 
 
 	@classmethod
@@ -263,9 +267,6 @@ class Repository(object):
 	def remoteAdd(self, url: str, name: str = 'origin'):
 		self.url = url
 		self.execute(f'git remote add {name} {url}')
-		#update remotes
-		remotes = self.execute('git remote')[0]
-		self.remotes = set(remotes.split('\n'))
 
 
 	def file(self, filePath: Union[str, Path]) -> Path:
@@ -303,3 +304,23 @@ class Status(object):
 		subprocess.run(f'git -C {str(self._directory)} fetch origin', shell=True)
 		status = subprocess.run(f'git -C {str(self._directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
 		return 'Your branch is up to date with' in status
+
+class Remote(object):
+
+	def __init__(self, name: str = None, url: str = None, user: str = None, statusString: str = None):
+		"""
+		:param name:
+		:param url:
+		:param user: if not supplied is extracted from url/statusString
+		:param statusString: e.g. "origin  https://github.com/project-alice-assistant/skill_AliceCore.git (push)"
+		"""
+		self.name = name
+		self.url = url
+		self.user = user
+
+		if statusString is not None:
+			self.name, dummy, self.url, direction = statusString.split(' ')
+		if self.user is None:
+			match = re.search('github.com/(.+?)/', self.url)
+			if match:
+				self.user = match.group(1)
