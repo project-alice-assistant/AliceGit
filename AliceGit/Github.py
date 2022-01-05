@@ -45,7 +45,7 @@ class Github(object):
 		self.checkUsers()
 
 		# first get the status/remotes for all repositories - set to none if not existing
-		self.usersUrl: Optional[Remote] = self.getRemote(url=self.usersUrl)
+		self.usersRemote: Optional[Remote] = self.getRemote(url=self.usersUrl)
 		self.officialRemote: Optional[Remote] = self.getRemote(url=self.officialUrl)
 
 		# only creation of users repositories is possible
