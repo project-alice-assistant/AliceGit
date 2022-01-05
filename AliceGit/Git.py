@@ -28,7 +28,7 @@ from typing import Callable, List, Tuple, Union
 
 import requests
 
-from .Exceptions import AlreadyGitRepository, DirtyRepository, InvalidUrl, NotGitRepository, PathNotFoundException
+from .Exceptions import AlreadyGitRepository, DirtyRepository, InvalidUrl, NotGitRepository, PathNotFoundException, RemoteAlreadyExists
 
 
 class Repository(object):
@@ -243,14 +243,24 @@ class Repository(object):
 		self.execute('git add --all')
 
 
-	def commit(self, message: str = '', autoAdd: bool = False):
+	def commit(self, message: str = '', autoAdd: bool = False) -> bool:
+		"""
+		commit all changes in the tree
+		:param message:
+		:param autoAdd: add --all before commiting
+		:return: True if there was something to commit and it succeeds
+		"""
 		if not message:
 			message = 'Commit by ProjectAliceBot'
 
 		cmd = f'git commit -m "{message}"'
 		if autoAdd:
 			cmd += ' --all'
-		self.execute(cmd)
+		out, err = self.execute(cmd)
+		if err or 'nothing to commit' in out:
+			return False
+		else:
+			return True
 
 
 	def push(self, repository: str = None, upstream: str = 'origin', branch: str = 'master'):

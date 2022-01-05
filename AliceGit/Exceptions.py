@@ -54,3 +54,9 @@ class GithubForkFailed(Exception):
 class GithubAlreadyForked(Exception):
 	def __init__(self, repository: str):
 		super().__init__(f'The repository {repository} is already forked')
+
+
+class RemoteAlreadyExists(Exception):
+	def __init__(self, name: str):
+		super().__init__(f'The remote {name} is already defined')
+
