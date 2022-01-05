@@ -28,7 +28,7 @@ from .Exceptions import GithubAlreadyForked, GithubCreateFailed, GithubForkFaile
 
 class Github(object):
 
-	def __init__(self, username: str = '', token: str = '', repositoryName: str = '', useUrlInstead: str = '', createRepository: bool = False, options: Dict = None):
+	def __init__(self, username: str = '', token: str = '', repositoryName: str = '', useUrlInstead: str = '', createRepository: bool = False, options: Dict = None, officialUser: str = 'project-alice-assistant'):
 		if not useUrlInstead and (not username or not token or not repositoryName):
 			raise Exception('Please provide username, token and repository name if you are not using useUrlInstead')
 		elif useUrlInstead and createRepository:
@@ -42,29 +42,44 @@ class Github(object):
 		self.remote: Optional[Remote] = None
 
 		if not useUrlInstead:
+			self.officialUrl = f'https://github.com/{officialUser}/{repositoryName}.git'
 			self.repositoryName = repositoryName
 
 			response = requests.get(f'https://github.com/{username}')
 			if response.status_code != 200:
 				raise GithubUserNotFound(username=username)
 
-			self.url = f'https://github.com/{username}/{repositoryName}.git'
-			response = requests.get(self.url)
+			# first try the user specific repository!
+			self.usersUrl = f'https://github.com/{username}/{repositoryName}.git'
+			response = requests.get(self.usersUrl)
 			if response.status_code != 200 and not createRepository:
-				raise GithubRepoNotFound(repositoryName=repositoryName)
+				# check if at least the official repository exists
+				response = requests.get(self.officialUrl)
+				if response.status_code != 200:
+					raise GithubRepoNotFound(repositoryName=repositoryName)
+				else:
+					self.usersUrl = None
 			elif response.status_code != 200 and createRepository:
 				self.remote = self.createRepository(repositoryName=repositoryName, options=options)
 			else:
-				self.remote = Remote(url=self.url, apiAuth=self.auth)
+				self.remote = Remote(url=self.usersUrl, apiAuth=self.auth)
 		else:
-			self.url = useUrlInstead
-			self.repositoryName = Path(self.url).stem
-			response = requests.get(self.url)
+			self.officialUrl = None
+			self.usersUrl = useUrlInstead
+			self.repositoryName = Path(self.usersUrl).stem
+			response = requests.get(self.usersUrl)
 			if response.status_code != 200:
 				raise GithubRepoNotFound(repositoryName=repositoryName)
 
-			self.remote = Remote(url=self.url, apiAuth=self.auth)
+			self.remote = Remote(url=self.usersUrl, apiAuth=self.auth)
 
+	@property
+	def url(self):
+		"""
+		property to keep the old .url alive even with two remotes
+		:return:
+		"""
+		return self.usersUrl
 
 	def createRepository(self, repositoryName: str, repositoryDescription: str = '', options: Dict = None) -> Remote:
 		"""
