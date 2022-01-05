@@ -232,7 +232,7 @@ class Repository(object):
 		if not command.startswith('git -C') and not noDashCOption:
 			command = command.replace('git', f'git -C {str(self.path)}', 1)
 
-		if self._quiet:
+		if self._quiet and 'remote' not in command:
 			command = f'{command} --quiet'
 
 		result = subprocess.run(command, capture_output=True, text=True, shell=True)
