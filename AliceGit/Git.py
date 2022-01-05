@@ -266,8 +266,8 @@ class Repository(object):
 	def push(self, repository: str = None, upstream: str = 'origin', branch: str = 'master'):
 		if not repository:
 			repository = self.url
-		self.execute(f'git push --repo={repository} --set-upstream {upstream} {branch}')
-
+		out, err = self.execute(f'git push --repo={repository} --set-upstream {upstream} {branch}')
+		return out, err
 
 	def config(self, key: str, value: str, isGlobal: bool = False):
 		mode = '--global' if isGlobal else '--local'
@@ -276,7 +276,13 @@ class Repository(object):
 
 	def remoteAdd(self, url: str, name: str = 'origin'):
 		self.url = url
-		self.execute(f'git remote add {name} {url}')
+		out, err = self.execute(f'git remote add {name} {url}')
+		if 'already exists' in err:
+			raise RemoteAlreadyExists(name=name)
+		if err:
+			return False
+		else:
+			return True
 
 
 	def file(self, filePath: Union[str, Path]) -> Path:
