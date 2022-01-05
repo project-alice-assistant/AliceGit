@@ -39,7 +39,7 @@ class Github(object):
 		self.username = username
 		self.officialUser = officialUser
 
-		self.usersUrl = f'https://github.com/{self.username}/{self.repositoryName}.git'
+		self.usersUrl = f'https://{self.username}:{self.token}@github.com/{self.username}/{self.repositoryName}.git'
 		self.officialUrl = f'https://github.com/{self.officialUser}/{self.repositoryName}.git'
 
 		self.checkUsers()
