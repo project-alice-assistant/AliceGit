@@ -99,7 +99,7 @@ class Github(object):
 	def getStatusForUrl(self, url: str):
 		response = requests.get(url)
 		if response.status_code != 200:
-			raise GithubRepoNotFound(repositoryName=repositoryName)
+			raise GithubRepoNotFound(repositoryName=self.repositoryName)
 		return response
 
 	def createRepository(self, repositoryName: str, repositoryDescription: str = '', options: Dict = None) -> Remote:
