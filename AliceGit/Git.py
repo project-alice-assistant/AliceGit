@@ -263,9 +263,7 @@ class Repository(object):
 			return True
 
 
-	def push(self, repository: str = None, upstream: str = 'origin', branch: str = 'master'):
-		if not repository:
-			repository = self.url
+	def push(self, repository: str = 'AliceSK', upstream: str = 'AliceSK', branch: str = 'master'):
 		out, err = self.execute(f'git push --repo={repository} --set-upstream {upstream} {branch}')
 		return out, err
 
