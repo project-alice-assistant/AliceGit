@@ -71,7 +71,7 @@ class Repository(object):
 
 	@property
 	def remote(self) -> dict[Remote]:
-		remotes = self.execute('git remote')[0]
+		remotes = self.execute('git remote -v')[0]
 		return dict((rem.user, rem) for rem in [Remote(repository=self, remoteString=r) for r in remotes.split('\n')])
 
 
@@ -325,7 +325,7 @@ class Status(object):
 
 class Remote(object):
 
-	def __init__(self, repository: Repository, name: str = None, url: str = None, user: str = None, remoteString: str = None):
+	def __init__(self, repository: Repository, name: str = None, url: str = None, user: str = None, type: str = '', remoteString: str = None):
 		"""
 		:param name:
 		:param url:
@@ -336,9 +336,11 @@ class Remote(object):
 		self.name = name
 		self.url = url
 		self.user = user
+		self.type = type
 
 		if remoteString is not None:
-			self.name, dummy, self.url, direction = remoteString.split(' ')
+			rest, self.type = remoteString.split(' ')
+			self.name, self.url = rest.split('\t')
 		if self.user is None:
 			match = re.search('github.com/(.+?)/', self.url)
 			if match:
