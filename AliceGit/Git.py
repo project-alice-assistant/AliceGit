@@ -352,4 +352,8 @@ class Remote(object):
 		:param branch:
 		:return:
 		"""
-		return subprocess.run(f'git -C {str(self.repository.path)} rev-list --count {self.name}/{branch}..HEAD', shell=True).stdout.strip()[0]
+		subprocess.run(f'git -C {str(self.repository.path)} fetch', shell=True)
+		proc = subprocess.run(f'git -C {str(self.repository.path)} rev-list --count {self.name}/{branch}..HEAD', shell=True)
+		if proc.stdout is None:
+			return proc.stderr
+		return proc.stdout.strip()[0]
