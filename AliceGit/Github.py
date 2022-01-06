@@ -95,7 +95,7 @@ class Github(object):
 		except GithubRepoNotFound:
 			return None
 
-	@static
+	@staticmethod
 	def getStatusForUrl(url: str, silent: bool = False):
 		response = requests.get(url)
 		if response.status_code != 200:
