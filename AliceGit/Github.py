@@ -95,11 +95,14 @@ class Github(object):
 		except GithubRepoNotFound:
 			return None
 
-
-	def getStatusForUrl(self, url: str):
+	@static
+	def getStatusForUrl(url: str, silent: bool = False):
 		response = requests.get(url)
 		if response.status_code != 200:
-			raise GithubRepoNotFound(repositoryName=self.repositoryName)
+			if silent:
+				return False
+			else:
+				raise GithubRepoNotFound(repositoryName=url)
 		return response
 
 	def createRepository(self, repositoryName: str, repositoryDescription: str = '', options: Dict = None) -> Remote:
