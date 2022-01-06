@@ -337,8 +337,8 @@ class Remote(object):
 		self.url = url
 		self.user = user
 
-		if statusString is not None:
-			self.name, dummy, self.url, direction = statusString.split(' ')
+		if remoteString is not None:
+			self.name, dummy, self.url, direction = remoteString.split(' ')
 		if self.user is None:
 			match = re.search('github.com/(.+?)/', self.url)
 			if match:
