@@ -60,15 +60,19 @@ class Repository(object):
 			if not isRepository:
 				raise NotGitRepository
 
-		tags           = self.execute('git tag')[0]
-		self.tags      = set(tags.split('\n'))
-		branches       = self.execute('git branch')[0]
-		self.branches  = set(branches.split('\n'))
+
+	@property
+	def tags(self):
+		return set(self.execute('git tag')[0].split('\n'))
+
+	@property
+	def branches(self):
+		return set(self.execute('git branch')[0].split('\n'))
 
 	@property
 	def remote(self) -> dict[Remote]:
 		remotes = self.execute('git remote')[0]
-		return dict((rem.user, rem) for rem in [Remote(statusString=st) for st in remotes.split('\n')])
+		return dict((rem.user, rem) for rem in [Remote(repository=self, remoteString=r) for r in remotes.split('\n')])
 
 
 	@classmethod
@@ -321,13 +325,14 @@ class Status(object):
 
 class Remote(object):
 
-	def __init__(self, name: str = None, url: str = None, user: str = None, statusString: str = None):
+	def __init__(self, repository: Repository, name: str = None, url: str = None, user: str = None, remoteString: str = None):
 		"""
 		:param name:
 		:param url:
 		:param user: if not supplied is extracted from url/statusString
 		:param statusString: e.g. "origin  https://github.com/project-alice-assistant/skill_AliceCore.git (push)"
 		"""
+		self.repository: Repository = repository
 		self.name = name
 		self.url = url
 		self.user = user
@@ -345,4 +350,4 @@ class Remote(object):
 		:param branch:
 		:return:
 		"""
-		return subprocess.run(f'git rev-list --count {self.name}/{branch}..HEAD').stdout.strip()[0]
+		return subprocess.run(f'git -C {str(self.repository.path)} rev-list --count {self.name}/{branch}..HEAD').stdout.strip()[0]
