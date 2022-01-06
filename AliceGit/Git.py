@@ -353,7 +353,7 @@ class Remote(object):
 		:return:
 		"""
 		subprocess.run(f'git -C {str(self.repository.path)} fetch', shell=True)
-		proc = subprocess.run(f'git -C {str(self.repository.path)} rev-list --count {self.name}/{branch}..HEAD', shell=True)
+		proc = subprocess.run(f'git -C {str(self.repository.path)} rev-list --count {self.name}/{branch}..HEAD', shell=True, capture_output=True, text=True)
 		if proc.stdout is None:
 			return proc.stderr
 		return proc.stdout.strip()[0]
