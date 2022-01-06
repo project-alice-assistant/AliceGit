@@ -338,3 +338,11 @@ class Remote(object):
 			match = re.search('github.com/(.+?)/', self.url)
 			if match:
 				self.user = match.group(1)
+
+	def getCommitCount(self, branch: str = 'master'):
+		"""
+		returns the number of commits the current HEAD is in front of the given branch
+		:param branch:
+		:return:
+		"""
+		return subprocess.run(f'git rev-list --count {self.name}/{branch}..HEAD').stdout.strip()[0]
