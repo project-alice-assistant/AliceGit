@@ -19,14 +19,13 @@
 from __future__ import annotations
 
 import os
+import re
+import requests
 import shutil
 import stat
 import subprocess
-import re
 from pathlib import Path
 from typing import Callable, List, Tuple, Union
-
-import requests
 
 from .Exceptions import AlreadyGitRepository, DirtyRepository, InvalidUrl, NotGitRepository, PathNotFoundException, RemoteAlreadyExists
 
@@ -251,8 +250,8 @@ class Repository(object):
 		"""
 		commit all changes in the tree
 		:param message:
-		:param autoAdd: add --all before commiting
-		:return: True if there was something to commit and it succeeds
+		:param autoAdd: add --all before committing
+		:return: True if there was something to commit, and it succeeds
 		"""
 		if not message:
 			message = 'Commit by ProjectAliceBot'
@@ -267,16 +266,17 @@ class Repository(object):
 			return True
 
 
-	def push(self, repository: str = 'AliceSK', upstream: str = 'AliceSK', branch: str = 'master'):
+	def push(self, repository: str = 'AliceSK', upstream: str = 'AliceSK', branch: str = 'master') -> Tuple[str, str]:
 		out, err = self.execute(f'git push --repo={repository} --set-upstream {upstream} {branch}')
 		return out, err
+
 
 	def config(self, key: str, value: str, isGlobal: bool = False):
 		mode = '--global' if isGlobal else '--local'
 		self.execute(f'git config {mode} {key} {value}')
 
 
-	def remoteAdd(self, url: str, name: str = 'origin'):
+	def remoteAdd(self, url: str, name: str = 'origin') -> bool:
 		self.url = url
 		out, err = self.execute(f'git remote add {name} {url}')
 		if 'already exists' in err:
@@ -313,15 +313,16 @@ class Status(object):
 		self._directory = directory
 
 
-	def isDirty(self):
+	def isDirty(self) -> bool:
 		status = subprocess.run(f'git -C {str(self._directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
 		return 'working tree clean' not in status
 
 
-	def isUpToDate(self):
+	def isUpToDate(self) -> bool:
 		subprocess.run(f'git -C {str(self._directory)} fetch origin', shell=True)
 		status = subprocess.run(f'git -C {str(self._directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
 		return 'Your branch is up to date with' in status
+
 
 class Remote(object):
 
@@ -338,22 +339,26 @@ class Remote(object):
 		self.user = user
 		self.type = type
 
-		if remoteString is not None:
+		if remoteString:
 			rest, self.type = remoteString.split(' ')
 			self.name, self.url = rest.split('\t')
-		if self.user is None:
+
+		if not self.user:
 			match = re.search('github.com/(.+?)/', self.url)
 			if match:
 				self.user = match.group(1)
 
-	def getCommitCount(self, branch: str = 'master'):
+
+	def getCommitCount(self, branch: str = 'master') -> int:
 		"""
-		returns the number of commits the current HEAD is in front of the given branch
+		Returns the number of commits the current HEAD is in front of the given branch
 		:param branch:
 		:return:
 		"""
 		subprocess.run(f'git -C {str(self.repository.path)} fetch', shell=True)
+
 		proc = subprocess.run(f'git -C {str(self.repository.path)} rev-list --count {self.name}/{branch}..HEAD', shell=True, capture_output=True, text=True)
-		if proc.stdout is None:
+		if not proc.stdout:
 			return proc.stderr
-		return proc.stdout.strip()
+
+		return int(proc.stdout.strip())
