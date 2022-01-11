@@ -349,7 +349,8 @@ class Status(object):
 		status = subprocess.run(f'git -C {str(self._directory)} status --porcelain', capture_output=True, text=True, shell=True).stdout.strip()
 		for line in status.split('\n'):
 			element = line.split(' ')
-			changes[element[1]] = element[0]
+			if len(element) > 1:
+				changes[element[1]] = element[0]
 		return changes
 
 
