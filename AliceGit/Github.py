@@ -64,7 +64,7 @@ class Github(object):
 		if self.usersRemote is None:
 			# if there is no official repository, create a users repository from scratch!
 			if self.officialRemote is None:
-				self.createRepository(repositoryName=self.repositoryName, options=options)
+				self.usersRemote = self.createRepository(repositoryName=self.repositoryName, options=options)
 			# else, fork the repository!
 			else:
 				self.usersRemote = self.officialRemote.fork()
@@ -80,7 +80,7 @@ class Github(object):
 			raise GithubUserNotFound(username=self.username)
 
 		response = requests.get(f'https://github.com/{self.officialUser}')
-		if response.status_code != 200:
+		if response.status_code not in [200, 201]:
 			raise GithubUserNotFound(username=self.officialUser)
 
 	def getRemote(self, url: str) -> Remote:
