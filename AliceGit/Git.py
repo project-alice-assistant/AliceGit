@@ -340,6 +340,20 @@ class Status(object):
 		return 'Your branch is up to date with' in status
 
 
+	def changes(self) -> dict:
+		"""
+		get changed files with their type (unstaged, modified etc.)
+		:return:
+		"""
+		changes = dict()
+		status = subprocess.run(f'git -C {str(self._directory)} status --porcelain', capture_output=True, text=True, shell=True).stdout.strip()
+		for line in status.split('\n'):
+			element = line.split(' ')
+			changes[element[1]] = element[0]
+		return changes
+
+
+
 class Remote(object):
 
 	def __init__(self, repository: Repository, name: str = None, url: str = None, user: str = None, type: str = '', remoteString: str = None):
