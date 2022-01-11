@@ -323,7 +323,15 @@ class Status(object):
 
 	def isDirty(self) -> bool:
 		status = subprocess.run(f'git -C {str(self._directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
-		return 'working tree clean' not in status
+		if 'working tree clean' not in status:
+			return True
+		revList = subprocess.run(f'git -C {str(self._directory)} rev-list --count origin/master..HEAD', capture_output=True, text=True, shell=True).stdout.strip()
+		try:
+			if int(revList) > 0:
+				return True
+		except ValueError:
+			return True
+		return False
 
 
 	def isUpToDate(self) -> bool:
