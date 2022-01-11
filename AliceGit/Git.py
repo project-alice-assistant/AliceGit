@@ -238,7 +238,9 @@ class Repository(object):
 		if not command.startswith('git -C') and not noDashCOption:
 			command = command.replace('git', f'git -C {str(self.path)}', 1)
 
-		if self._quiet and 'remote' not in command:
+		if self._quiet \
+				and 'remote' not in command\
+				and 'add' not in command:
 			command = f'{command} --quiet'
 
 		result = subprocess.run(command, capture_output=True, text=True, shell=True)
@@ -260,7 +262,9 @@ class Repository(object):
 			message = 'Commit by ProjectAliceBot'
 
 		if autoAdd:
-			self.execute('git add --all')
+			out, err = self.execute('git add --all')
+		if err:
+			return False
 
 		cmd = f'git commit -m "{message}"'
 		out, err = self.execute(cmd)
