@@ -259,9 +259,10 @@ class Repository(object):
 		if not message:
 			message = 'Commit by ProjectAliceBot'
 
-		cmd = f'git commit -m "{message}"'
 		if autoAdd:
-			cmd += ' --all'
+			self.execute('git add --all')
+
+		cmd = f'git commit -m "{message}"'
 		out, err = self.execute(cmd)
 		if err or 'nothing to commit' in out:
 			return False
