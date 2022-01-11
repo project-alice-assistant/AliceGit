@@ -50,13 +50,13 @@ class Github(object):
 
 		# only creation of users repositories is possible
 		if createRepository:
-			self.handleCreation()
+			self.handleCreation(options=options)
 
 		# if both repositories don't exist we have a problem.
 		if self.usersRemote is None and self.officialRemote is None:
 			raise GithubRepoNotFound(repositoryName=repositoryName)
 
-	def handleCreation(self):
+	def handleCreation(self, options: Dict = None):
 		"""
 		Checks if the users repository is missing, if so either forks from official or creates a new repository
 		:return:
