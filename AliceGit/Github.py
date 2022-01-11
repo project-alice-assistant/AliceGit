@@ -80,7 +80,7 @@ class Github(object):
 			raise GithubUserNotFound(username=self.username)
 
 		response = requests.get(f'https://github.com/{self.officialUser}')
-		if response.status_code not in [200, 201]:
+		if response.status_code != 200:
 			raise GithubUserNotFound(username=self.officialUser)
 
 	def getRemote(self, url: str) -> Remote:
@@ -124,7 +124,7 @@ class Github(object):
 
 		if response.status_code == 429:
 			raise GithubRateLimit(username=self.username)
-		elif response.status_code != 200:
+		elif response.status_code not in [200, 201]:
 			raise GithubCreateFailed(repositoryName=repositoryName, statusCode=response.status_code)
 		else:
 			return Remote(url=self.usersUrl, apiAuth=self.auth)
