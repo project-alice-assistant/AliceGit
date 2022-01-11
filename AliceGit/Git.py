@@ -71,7 +71,10 @@ class Repository(object):
 	@property
 	def remote(self) -> dict[Remote]:
 		remotes = self.execute('git remote -v')[0]
-		return dict((rem.user, rem) for rem in [Remote(repository=self, remoteString=r) for r in remotes.split('\n')])
+		if len(remotes) > 0:
+			return dict((rem.user, rem) for rem in [Remote(repository=self, remoteString=r) for r in remotes.split('\n')])
+		else:
+			return dict()
 
 
 	@classmethod
