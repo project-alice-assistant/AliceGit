@@ -329,7 +329,8 @@ class Status(object):
 		try:
 			if int(revList) > 0:
 				return True
-		except ValueError:
+		except ValueError as e:
+			print(f'VALUE ERROR: {str(e)}')
 			return True
 		return False
 
@@ -348,7 +349,7 @@ class Status(object):
 		changes = dict()
 		status = subprocess.run(f'git -C {str(self._directory)} status --porcelain', capture_output=True, text=True, shell=True).stdout.strip()
 		for line in status.split('\n'):
-			element = line.split(' ')
+			element = line.strip().split(' ')
 			if len(element) > 1:
 				changes[element[1]] = element[0]
 		return changes
