@@ -185,7 +185,7 @@ class Repository(object):
 			return self.listStash()
 
 
-	def pull(self, force: bool = False):
+	def pull(self, force: bool = False, pullSubmodules: bool = False):
 		if self.isDirty():
 			if not force:
 				raise DirtyRepository()
@@ -194,9 +194,26 @@ class Repository(object):
 
 		self.execute('git pull')
 
+		if pullSubmodules:
+			self.pullSubmodules(force=force)
 
-	def fetch(self):
+
+	def pullSubmodules(self, force: bool = False):
+		if force:
+			self.execcute('git submodule foreach git stash')
+
+		self.execute('git submodule foreach git pull')
+
+
+	def fetch(self, fetchSubmodules: bool = False):
 		self.execute('git fetch')
+
+		if fetchSubmodules:
+			self.fetchSubmodules()
+
+
+	def fetchSubmodules(self):
+		self.execute('git submodule foreach git fetch')
 
 
 	def reset(self):
@@ -263,8 +280,8 @@ class Repository(object):
 
 		if autoAdd:
 			out, err = self.execute('git add --all')
-		if err:
-			return False
+			if err:
+				return False
 
 		cmd = f'git commit -m "{message}"'
 		out, err = self.execute(cmd)
