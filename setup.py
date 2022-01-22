@@ -47,7 +47,7 @@ setup(
 		'coveralls~=3.3.1'
 	],
 	classifiers=[
-		"Development Status :: 3 - Alpha",
+		"Development Status :: 5 - Production/Stable",
 		"Environment :: Console",
 		"Intended Audience :: Developers",
 		"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
