@@ -412,3 +412,28 @@ class Remote(object):
 			return proc.stderr
 
 		return int(proc.stdout.strip())
+
+
+	def lsRemote(self, heads: bool = True, tags: bool = True):
+		"""
+		List references in a remote repository
+		types: tag for tags and head for branches
+		:return:
+		"""
+		option = f'{"-" if heads or tags else ""}' \
+		         f'{"h" if heads else ""}' \
+		         f'{"t" if tags else ""}'
+		proc = subprocess.run(f'git -C {str(self.repository.path)} ls-remote {option} {self.name}', shell=True, capture_output=True, text=True)
+
+		if not proc.stdout and proc.stderr:
+			raise Exception(proc.stderr)
+
+		out = dict()
+		for line in proc.stdout.strip().split('\n'):
+			commit,path = line.split('\t')
+			type = 'tag' if path.startswith('refs/tags/') else 'head'
+			out[path[10:] if type == 'tag' else path[11:]] = { 'ref': path ,
+												              'type': type,
+										                    'commit': commit }
+
+		return out
