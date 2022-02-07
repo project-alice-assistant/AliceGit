@@ -358,6 +358,19 @@ class Status(object):
 		return 'Your branch is up to date with' in status
 
 
+	def getUpstream(self):
+		"""
+		return the current upstream of the repository
+		:return:
+		"""
+		status = subprocess.run(f'git -C {str(self._directory)} status', capture_output=True, text=True, shell=True).stdout.strip()
+		match = re.search('Your branch is .* \'(.+?)\'', status)
+		if match:
+			return match.group(1)
+		else:
+			return None
+
+
 	def changes(self) -> dict:
 		"""
 		get changed files with their type (unstaged, modified etc.)
@@ -370,7 +383,6 @@ class Status(object):
 			if len(element) > 1:
 				changes[element[1]] = element[0]
 		return changes
-
 
 
 class Remote(object):
