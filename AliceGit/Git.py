@@ -426,7 +426,7 @@ class Remote(object):
 		:param ahead: True: get the number the remote is ahead of HEAD; False: get the commits, remote is behind of HEAD
 		:return:
 		"""
-		subprocess.run(f'git -C {str(self.repository.path)} fetch', shell=True)
+		subprocess.run(f'git -C {str(self.repository.path)} fetch {self.name}', shell=True)
 		ref = f'{self.name}/{branch}..HEAD' if ahead else f'HEAD..{self.name}/{branch}'
 		proc = subprocess.run(f'git -C {str(self.repository.path)} rev-list --count {ref}', shell=True, capture_output=True, text=True)
 		if not proc.stdout:
