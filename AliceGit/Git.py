@@ -216,8 +216,8 @@ class Repository(object):
 		self.execute('git submodule foreach git fetch')
 
 
-	def reset(self):
-		self.execute('git reset --hard')
+	def reset(self, remote: str = ""):
+		self.execute(f'git reset --hard {remote}')
 
 
 	def clean(self, removeUntrackedFiles: bool = True, removeUntrackedDirectory: bool = True, removeIgnored: bool = False):
