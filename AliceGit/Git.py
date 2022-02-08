@@ -242,6 +242,15 @@ class Repository(object):
 		shutil.rmtree(self.path, onerror=self.fixPermissions)
 
 
+	def setUpstream(self, remote: str = None, branch: str = None, repository: str = None):
+		if not repository:
+			if not remote or not branch:
+				raise Exception("Missing information. Remote and branch, or repository required.")
+			repository = f'{remote}/{branch}'
+		out, err = self.execute(f'git branch --set-upstream-to {repository}')
+		return out, err
+
+
 	@staticmethod
 	def fixPermissions(func: Callable, path: Path, *_args):
 		if not os.access(path, os.W_OK):
