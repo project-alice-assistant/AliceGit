@@ -58,11 +58,11 @@ class Github(object):
 
 	def handleCreation(self, options: Dict = None):
 		"""
-		Checks if the users repository is missing, if so either forks from official or creates a new repository
+		Checks if the user's repository is missing, if so either forks from official or creates a new repository
 		:return:
 		"""
 		if self.usersRemote is None:
-			# if there is no official repository, create a users repository from scratch!
+			# if there is no official repository, create a user repository from scratch!
 			if self.officialRemote is None:
 				self.usersRemote = self.createRepository(repositoryName=self.repositoryName, options=options)
 			# else, fork the repository!
@@ -83,7 +83,7 @@ class Github(object):
 		if response.status_code != 200:
 			raise GithubUserNotFound(username=self.officialUser)
 
-	def getRemote(self, url: str) -> Remote:
+	def getRemote(self, url: str) -> Optional[Remote]:
 		"""
 		get the remote for a given url using the objects auth
 		:param url:
@@ -107,7 +107,7 @@ class Github(object):
 
 	def createRepository(self, repositoryName: str, repositoryDescription: str = '', options: Dict = None) -> Remote:
 		"""
-		Creates a repository on Github
+		Creates a repository on GitHub
 		:param repositoryName:
 		:param repositoryDescription:
 		:param options:

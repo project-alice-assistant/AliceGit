@@ -200,7 +200,7 @@ class Repository(object):
 
 	def pullSubmodules(self, force: bool = False):
 		if force:
-			self.execcute('git submodule foreach git stash')
+			self.execute('git submodule foreach git stash')
 
 		self.execute('git submodule foreach git pull')
 
@@ -396,18 +396,18 @@ class Status(object):
 
 class Remote(object):
 
-	def __init__(self, repository: Repository, name: str = None, url: str = None, user: str = None, type: str = '', remoteString: str = None):
+	def __init__(self, repository: Repository, name: str = None, url: str = None, user: str = None, typ: str = '', remoteString: str = None):
 		"""
 		:param name:
 		:param url:
 		:param user: if not supplied is extracted from url/statusString
-		:param statusString: e.g. "origin  https://github.com/project-alice-assistant/skill_AliceCore.git (push)"
+		:param remoteString: e.g. "origin  https://github.com/project-alice-assistant/skill_AliceCore.git (push)"
 		"""
 		self.repository: Repository = repository
 		self.name = name
 		self.url = url
 		self.user = user
-		self.type = type
+		self.type = typ
 
 		if remoteString:
 			rest, self.type = remoteString.split(' ')
@@ -430,7 +430,8 @@ class Remote(object):
 		ref = f'{self.name}/{branch}..HEAD' if ahead else f'HEAD..{self.name}/{branch}'
 		proc = subprocess.run(f'git -C {str(self.repository.path)} rev-list --count {ref}', shell=True, capture_output=True, text=True)
 		if not proc.stdout:
-			return proc.stderr
+			print(proc.stderr)
+			return -1
 
 		return int(proc.stdout.strip())
 
@@ -452,9 +453,9 @@ class Remote(object):
 		out = dict()
 		for line in proc.stdout.strip().split('\n'):
 			commit,path = line.split('\t')
-			type = 'tag' if path.startswith('refs/tags/') else 'head'
-			out[path[10:] if type == 'tag' else path[11:]] = { 'ref': path ,
-												              'type': type,
+			typ = 'tag' if path.startswith('refs/tags/') else 'head'
+			out[path[10:] if typ == 'tag' else path[11:]] = { 'ref': path ,
+												              'type': typ,
 										                    'commit': commit }
 
 		return out
